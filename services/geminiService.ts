@@ -9,8 +9,6 @@ declare global {
   }
 }
 
-const API_KEY = window.API_KEY;
-
 let ai: GoogleGenAI | null = null;
 
 // Lazily initialize the AI instance to allow the app to load and display an error gracefully
@@ -19,11 +17,15 @@ const getAiInstance = () => {
   if (ai) {
     return ai;
   }
-  if (!API_KEY || typeof API_KEY !== 'string' || API_KEY.trim() === '') {
+
+  // Access window.API_KEY directly here to ensure we get it after the script has loaded.
+  const apiKey = window.API_KEY;
+
+  if (!apiKey || typeof apiKey !== 'string' || apiKey.trim() === '') {
     // This error will be caught by the calling function and displayed in the UI.
     throw new Error("Your Google Gemini API key is not configured. Please follow the setup instructions in the README.md file. For Vercel deployment, ensure the API_KEY environment variable is set in your project settings.");
   }
-  ai = new GoogleGenAI({ apiKey: API_KEY });
+  ai = new GoogleGenAI({ apiKey: apiKey });
   return ai;
 };
 
