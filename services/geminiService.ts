@@ -1,13 +1,32 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import type { CaseData, AssessmentResult, InteractionResult } from '../types';
 
-const API_KEY = process.env.API_KEY;
-
-if (!API_KEY) {
-  throw new Error("API_KEY environment variable is not set");
+// This will be populated by api-key.js, which is generated during the Vercel build process
+// or created manually for local development.
+declare global {
+  interface Window {
+    API_KEY: string;
+  }
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const API_KEY = window.API_KEY;
+
+let ai: GoogleGenAI | null = null;
+
+// Lazily initialize the AI instance to allow the app to load and display an error gracefully
+// if the API key is missing.
+const getAiInstance = () => {
+  if (ai) {
+    return ai;
+  }
+  if (!API_KEY || typeof API_KEY !== 'string' || API_KEY.trim() === '') {
+    // This error will be caught by the calling function and displayed in the UI.
+    throw new Error("Your Google Gemini API key is not configured. Please follow the setup instructions in the README.md file. For Vercel deployment, ensure the API_KEY environment variable is set in your project settings.");
+  }
+  ai = new GoogleGenAI({ apiKey: API_KEY });
+  return ai;
+};
+
 
 const model = "gemini-2.5-flash";
 
@@ -91,6 +110,7 @@ const formatCaseDataForPrompt = (data: CaseData): string => {
 
 export const assessCausality = async (data: CaseData): Promise<AssessmentResult> => {
   try {
+    const aiInstance = getAiInstance();
     let prompt: string;
 
     if (data.narrative && data.narrative.trim() !== '') {
@@ -99,7 +119,7 @@ export const assessCausality = async (data: CaseData): Promise<AssessmentResult>
       prompt = `Please perform a causality assessment for each drug-event pair in the following case:\n${formatCaseDataForPrompt(data)}`;
     }
 
-    const response = await ai.models.generateContent({
+    const response = await aiInstance.models.generateContent({
       model: model,
       contents: prompt,
       config: {
@@ -165,7 +185,8 @@ export const checkInteractions = async (drugs: string[]): Promise<InteractionRes
   const prompt = `Analyze the following list of drugs for potential drug-drug interactions: ${drugs.join(', ')}`;
 
   try {
-    const response = await ai.models.generateContent({
+    const aiInstance = getAiInstance();
+    const response = await aiInstance.models.generateContent({
       model: model,
       contents: prompt,
       config: {

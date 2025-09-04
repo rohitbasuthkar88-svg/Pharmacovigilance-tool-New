@@ -19,9 +19,9 @@ To run this application, you need a Google Gemini API key.
 
 ### **IMPORTANT: API Key Security**
 
-Your API key is a secret. Do **NOT** commit it to your repository or hard-code it directly into the source code. Anyone with access to your key can use your API quota.
+Your API key is a secret. Do **NOT** commit it to your repository. This project is configured to expose the API key to the client-side browser, which is acceptable for development or limited-access demos but is not a secure practice for a public-facing production application. For production, you should proxy API calls through a secure backend.
 
-The application is designed to load the API key from an environment variable named `API_KEY`.
+The application loads the API key from an `api-key.js` file.
 
 ### Running Locally
 
@@ -31,18 +31,15 @@ The application is designed to load the API key from an environment variable nam
     cd <repository-directory>
     ```
 
-2.  **Install dependencies:**
-    This project uses `es-module-shims` and direct CDN imports, so there is no `npm install` step needed for the base dependencies.
-
-3.  **Set up the Environment Variable:**
-    Create a file named `.env` in the root of your project directory and add your API key:
+2.  **Set up the API Key:**
+    Create a file named `api-key.js` in the root of your project directory and add your API key like this:
+    ```javascript
+    window.API_KEY = "YOUR_GEMINI_API_KEY_HERE";
     ```
-    API_KEY="YOUR_GEMINI_API_KEY_HERE"
-    ```
-    *Note: A local development server is required to load environment variables. A simple one can be created with Node.js/Express or by using tools like Vite.*
+    *Note: This file is intentionally not tracked by git to prevent accidental key exposure.*
 
-4.  **Serve the application:**
-    Use a simple HTTP server to run the `index.html` file. For example, using Python:
+3.  **Serve the application:**
+    Since this is a static project, you can use any simple HTTP server. For example, using Python:
     ```bash
     python -m http.server
     ```
@@ -50,25 +47,24 @@ The application is designed to load the API key from an environment variable nam
     ```bash
     npx serve .
     ```
+    Now, open your browser and navigate to the provided local address.
 
 ---
 
-## Deployment
+## Deployment to Vercel
 
-You can deploy this application to any modern static hosting provider (e.g., Vercel, Netlify, Cloudflare Pages).
+You can easily deploy this application to [Vercel](https://vercel.com).
 
-The critical step during deployment is to set the `API_KEY` environment variable within your hosting provider's dashboard.
-
-### Example: Deploying to Vercel
+The project is configured with a `package.json` that tells Vercel how to build the application. The build process will automatically create the required `api-key.js` file using an environment variable you provide.
 
 1.  Push your code to a GitHub, GitLab, or Bitbucket repository.
 2.  Import the repository into Vercel.
-3.  Vercel will likely auto-detect the project as a static site. No special build command is needed.
+3.  Vercel will detect the `package.json` and configure the project. You don't need to change any build settings. The "Output Directory" should be left as the default (which is the project root).
 4.  Navigate to your project's **Settings > Environment Variables** in the Vercel dashboard.
 5.  Add a new environment variable:
     -   **Name**: `API_KEY`
     -   **Value**: Paste your Gemini API key here.
-6.  Deploy! Vercel will build and deploy your site, making the environment variable securely available to the application.
+6.  Deploy! Vercel will run the build script, which injects your API key into the application, and deploy your site.
 
 ---
 
