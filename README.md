@@ -55,16 +55,16 @@ The application loads the API key from an `api-key.js` file.
 
 You can easily deploy this application to [Vercel](https://vercel.com).
 
-The project is configured with a `package.json` that tells Vercel how to build the application. The build process will automatically create the required `api-key.js` file using an environment variable you provide.
+The project is now configured to work with Vercel's default build settings out-of-the-box. The build process will automatically create a `public` directory containing the application and inject your API key from an environment variable.
 
 1.  Push your code to a GitHub, GitLab, or Bitbucket repository.
 2.  Import the repository into Vercel.
-3.  Vercel will detect the `package.json` and configure the project. You don't need to change any build settings. The "Output Directory" should be left as the default (which is the project root).
+3.  Vercel will detect the `package.json` and configure the project automatically. You should not need to change any build settings. Vercel will correctly identify `npm run build` as the build command and `public` as the output directory.
 4.  Navigate to your project's **Settings > Environment Variables** in the Vercel dashboard.
 5.  Add a new environment variable:
     -   **Name**: `API_KEY`
     -   **Value**: Paste your Gemini API key here.
-6.  Deploy! Vercel will run the build script, which injects your API key into the application, and deploy your site.
+6.  Deploy! Vercel will run the build script and deploy your site from the generated `public` directory.
 
 ---
 
