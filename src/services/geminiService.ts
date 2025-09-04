@@ -3,20 +3,29 @@ import type { CaseData, AssessmentResult, InteractionResult } from '../types';
 
 let ai: GoogleGenAI | null = null;
 
-// Lazily initialize the AI instance to allow the app to load and display an error gracefully
-// if the API key is missing.
+const apiKey = process.env.API_KEY;
+
+/**
+ * Checks if the Google Gemini API key is provided in the environment.
+ * This is the primary check used by the UI to show an error state.
+ * @returns {boolean} True if the API key is configured, false otherwise.
+ */
+export const isApiKeyConfigured = (): boolean => {
+  return !!apiKey && typeof apiKey === 'string' && apiKey.trim() !== '';
+};
+
+// Lazily initialize the AI instance.
 const getAiInstance = () => {
   if (ai) {
     return ai;
   }
 
-  // Use process.env.API_KEY as per the guidelines. Vite will replace this at build time.
-  const apiKey = process.env.API_KEY;
-
-  if (!apiKey || typeof apiKey !== 'string' || apiKey.trim() === '') {
-    // This error will be caught by the calling function and displayed in the UI.
-    throw new Error("Your Google Gemini API key is not configured. Please follow the setup instructions in the README.md file. For Vercel deployment, ensure the VITE_API_KEY environment variable is set in your project settings.");
+  if (!isApiKeyConfigured()) {
+    // This is now a fallback error. The main UI should prevent this from even being called.
+    throw new Error("Your Google Gemini API key is not configured. The application should have prevented this action. Please reload and follow the setup instructions.");
   }
+
+  // isApiKeyConfigured ensures apiKey is a non-empty string here.
   ai = new GoogleGenAI({ apiKey: apiKey });
   return ai;
 };

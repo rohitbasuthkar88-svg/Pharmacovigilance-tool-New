@@ -2,13 +2,21 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { CaseInputForm } from './components/CaseInputForm';
 import { AssessmentResult } from './components/AssessmentResult';
 import { AboutModal } from './components/AboutModal';
-import { assessCausality } from './services/geminiService';
+import { assessCausality, isApiKeyConfigured } from './services/geminiService';
+import { ApiKeyErrorOverlay } from './components/ApiKeyErrorOverlay';
 import type { CaseData, AssessmentResult as AssessmentResultType } from './types';
 import { BrainCircuitIcon, SunIcon, MoonIcon } from './components/icons';
 
 type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {
+  // Check for the API key at the start of the render.
+  // This value is determined at build time and will not change.
+  if (!isApiKeyConfigured()) {
+    // If the key is missing, render the overlay and prevent the app from loading further.
+    return <ApiKeyErrorOverlay />;
+  }
+
   const [assessmentResult, setAssessmentResult] = useState<AssessmentResultType | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

@@ -10,10 +10,12 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
-// Declare process to satisfy TypeScript for Vite's `define` feature.
-// FIX: Changed from const to var to avoid redeclaration error.
-declare var process: {
-  env: {
-    API_KEY: string;
-  };
-};
+// FIX: Augment the NodeJS.ProcessEnv interface to avoid redeclaring the global 'process' variable.
+// This resolves the "Subsequent variable declarations must have the same type" and
+// "Cannot redeclare block-scoped variable" errors by correctly extending the existing
+// types for process.env, as expected in an environment with @types/node.
+declare namespace NodeJS {
+  interface ProcessEnv {
+    readonly API_KEY: string;
+  }
+}
