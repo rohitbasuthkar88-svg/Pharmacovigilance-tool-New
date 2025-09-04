@@ -1,0 +1,5 @@
+{
+  "name": "ICSR Causality Assessment Tool",
+  "description": "An AI-powered chat bot that acts as a world-class drug safety physician to provide causality assessments for Individual Case Safety Reports (ICSR).",
+  "requestFramePermissions": []
+}
