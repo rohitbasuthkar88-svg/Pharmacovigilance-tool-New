@@ -11,7 +11,8 @@ const apiKey = process.env.API_KEY;
  * @returns {boolean} True if the API key is configured, false otherwise.
  */
 export const isApiKeyConfigured = (): boolean => {
-  return !!apiKey && typeof apiKey === 'string' && apiKey.trim() !== '';
+  // Explicitly check for 'undefined' because Vite replaces missing env vars with this string.
+  return !!apiKey && typeof apiKey === 'string' && apiKey.trim() !== '' && apiKey !== 'undefined';
 };
 
 // Lazily initialize the AI instance.
