@@ -10,13 +10,12 @@ const getAiInstance = () => {
     return ai;
   }
 
-  // FIX: Use process.env.API_KEY as per the guidelines.
+  // Use process.env.API_KEY as per the guidelines. Vite will replace this at build time.
   const apiKey = process.env.API_KEY;
 
   if (!apiKey || typeof apiKey !== 'string' || apiKey.trim() === '') {
     // This error will be caught by the calling function and displayed in the UI.
-    // FIX: Updated error message to refer to API_KEY, as VITE_API_KEY is no longer used.
-    throw new Error("Your Google Gemini API key is not configured. Please follow the setup instructions in the README.md file. For Vercel deployment, ensure the API_KEY environment variable is set in your project settings.");
+    throw new Error("Your Google Gemini API key is not configured. Please follow the setup instructions in the README.md file. For Vercel deployment, ensure the VITE_API_KEY environment variable is set in your project settings.");
   }
   ai = new GoogleGenAI({ apiKey: apiKey });
   return ai;
@@ -125,7 +124,10 @@ export const assessCausality = async (data: CaseData): Promise<AssessmentResult>
       },
     });
 
-    const jsonText = response.text.trim();
+    const jsonText = (response.text || "").trim();
+    if (!jsonText) {
+      return Promise.reject(new Error("The AI returned an empty response."));
+    }
     const parsedResult = JSON.parse(jsonText) as AssessmentResult;
     return parsedResult;
 
@@ -192,7 +194,11 @@ export const checkInteractions = async (drugs: string[]): Promise<InteractionRes
       },
     });
 
-    const jsonText = response.text.trim();
+    const jsonText = (response.text || "").trim();
+    if (!jsonText) {
+       // It's valid for the DDI check to return an empty array string "[]" or nothing, so we can return empty array.
+      return [];
+    }
     const parsedResult = JSON.parse(jsonText) as InteractionResult;
     return parsedResult;
   } catch (error) {

@@ -9,3 +9,11 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+// Declare process to satisfy TypeScript for Vite's `define` feature.
+// FIX: Changed from const to var to avoid redeclaration error.
+declare var process: {
+  env: {
+    API_KEY: string;
+  };
+};
