@@ -15,7 +15,7 @@ const getAiInstance = () => {
 
   if (!apiKey || typeof apiKey !== 'string' || apiKey.trim() === '') {
     // This error will be caught by the calling function and displayed in the UI.
-    // FIX: Updated error message to refer to API_KEY.
+    // FIX: Updated error message to refer to API_KEY, as VITE_API_KEY is no longer used.
     throw new Error("Your Google Gemini API key is not configured. Please follow the setup instructions in the README.md file. For Vercel deployment, ensure the API_KEY environment variable is set in your project settings.");
   }
   ai = new GoogleGenAI({ apiKey: apiKey });
